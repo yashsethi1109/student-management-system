@@ -1,0 +1,25 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments (yours is named venv)
+venv/
+.venv/
+env/
+
+# Secrets
+.env
+
+# Database (contains student records)
+*.db
+*.sqlite3
+
+# Generated files
+generated_reports/
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
