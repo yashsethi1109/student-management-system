@@ -1,16 +1,23 @@
+import os
 import sqlite3
 import bcrypt
 
 from datetime import datetime
 
+DB_FOLDER = "database"
+DB_PATH = os.path.join(DB_FOLDER, "student.db")
+
+
 def create_connection():
-    conn = sqlite3.connect("database/student.db")
+    # The database folder is not stored in Git, so create it if it is missing
+    os.makedirs(DB_FOLDER, exist_ok=True)
+    conn = sqlite3.connect(DB_PATH)
     return conn
+
 
 def create_table():
     conn = create_connection()
     cursor = conn.cursor()
-    
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS students (
@@ -22,7 +29,7 @@ def create_table():
     )
     """)
 
-    # student management table 
+    # student management table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS student_details (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -39,8 +46,7 @@ def create_table():
     )
     """)
 
-
-        # Attendance Management Table
+    # Attendance Management Table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS attendance (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -52,7 +58,7 @@ def create_table():
         FOREIGN KEY(student_id) REFERENCES student_details(student_id)
     )
     """)
-    
+
     # Marks Management Table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS marks (
@@ -67,17 +73,18 @@ def create_table():
         created_at TEXT,
         UNIQUE(student_id, subject),
         FOREIGN KEY(student_id) REFERENCES student_details(student_id)
-     )
-     """)
-    
+    )
+    """)
+
     # Add role column if it does not already exist
     try:
         cursor.execute("""
             ALTER TABLE students
             ADD COLUMN role TEXT DEFAULT 'Admin'
         """)
-    except:
-        pass  
+    except sqlite3.OperationalError:
+        # Column already exists
+        pass
 
     conn.commit()
     conn.close()
@@ -129,7 +136,6 @@ def register_user(
         conn.close()
 
 
-
 def login_user(email, password):
     conn = create_connection()
     cursor = conn.cursor()
@@ -165,6 +171,7 @@ def login_user(email, password):
 
     return False
 
+
 def get_total_students():
     conn = create_connection()
     cursor = conn.cursor()
@@ -176,7 +183,6 @@ def get_total_students():
     conn.close()
 
     return total
-
 
 
 def add_student(full_name, email, phone, course, semester, section, gender, dob):
@@ -191,7 +197,7 @@ def add_student(full_name, email, phone, course, semester, section, gender, dob)
         last_id = cursor.fetchone()[0]
 
         if last_id is None:
-           last_id = 0
+            last_id = 0
 
         student_id = f"STU{last_id + 1:04d}"
 
@@ -230,7 +236,7 @@ def add_student(full_name, email, phone, course, semester, section, gender, dob)
         return True
 
     except sqlite3.IntegrityError as e:
-        print("Database Error :",e)
+        print("Database Error :", e)
         return False
 
     finally:
@@ -289,6 +295,7 @@ def get_student(student_id):
 
     return student
 
+
 def update_student(
     student_id,
     full_name,
@@ -340,6 +347,7 @@ def update_student(
     finally:
         conn.close()
 
+
 def delete_student(student_id):
 
     conn = create_connection()
@@ -353,7 +361,8 @@ def delete_student(student_id):
     conn.commit()
     conn.close()
 
-    return True      
+    return True
+
 
 def search_students(search_text):
 
@@ -387,7 +396,8 @@ def search_students(search_text):
 
     conn.close()
 
-    return students  
+    return students
+
 
 def get_student_list():
 
@@ -407,6 +417,7 @@ def get_student_list():
     conn.close()
 
     return students
+
 
 def mark_attendance(student_id, attendance_date, status):
 
@@ -470,6 +481,7 @@ def get_attendance():
 
     return data
 
+
 def get_all_attendance():
 
     conn = create_connection()
@@ -493,6 +505,7 @@ def get_all_attendance():
     conn.close()
 
     return records
+
 
 def add_marks(
     student_id,
@@ -567,6 +580,7 @@ def add_marks(
 
         conn.close()
 
+
 def get_all_marks():
 
     conn = create_connection()
@@ -596,8 +610,9 @@ def get_all_marks():
 
     conn.close()
 
-    return records    
-    
+    return records
+
+
 def delete_marks(marks_id):
 
     conn = create_connection()
@@ -615,6 +630,7 @@ def delete_marks(marks_id):
     conn.close()
 
     return True
+
 
 def get_marks_by_id(marks_id):
 
@@ -644,6 +660,7 @@ def get_marks_by_id(marks_id):
     conn.close()
 
     return record
+
 
 def update_marks(
     marks_id,
@@ -712,6 +729,8 @@ def update_marks(
     finally:
 
         conn.close()
+
+
 def search_marks(search_text):
 
     conn = create_connection()
@@ -754,6 +773,7 @@ def search_marks(search_text):
 
     return records
 
+
 def get_total_marks_records():
 
     conn = create_connection()
@@ -769,6 +789,7 @@ def get_total_marks_records():
     conn.close()
 
     return total
+
 
 def get_average_percentage():
 
@@ -789,6 +810,7 @@ def get_average_percentage():
 
     return round(average, 2)
 
+
 def get_pass_marks_count():
 
     conn = create_connection()
@@ -805,6 +827,7 @@ def get_pass_marks_count():
     conn.close()
 
     return total
+
 
 def get_fail_marks_count():
 
@@ -823,6 +846,7 @@ def get_fail_marks_count():
 
     return total
 
+
 def get_total_subjects():
 
     conn = create_connection()
@@ -838,6 +862,7 @@ def get_total_subjects():
     conn.close()
 
     return total
+
 
 def get_topper():
 
@@ -867,6 +892,8 @@ def get_topper():
     conn.close()
 
     return topper
+
+
 def get_grade_distribution():
 
     conn = create_connection()
@@ -884,6 +911,8 @@ def get_grade_distribution():
     conn.close()
 
     return data
+
+
 def get_subject_wise_average():
 
     conn = create_connection()
@@ -901,6 +930,7 @@ def get_subject_wise_average():
     conn.close()
 
     return data
+
 
 def get_top_five_students():
 
@@ -925,6 +955,7 @@ def get_top_five_students():
     conn.close()
 
     return data
+
 
 def get_student_report_data(student_id):
 
@@ -991,6 +1022,7 @@ def get_student_report_data(student_id):
 
     return student, marks, attendance
 
+
 def get_student_performance_data(student_id):
 
     conn = create_connection()
@@ -1042,6 +1074,7 @@ def get_student_performance_data(student_id):
 
     return student_data, attendance_data
 
+
 def get_failed_subjects_count(student_id):
 
     conn = create_connection()
@@ -1066,6 +1099,7 @@ def get_failed_subjects_count(student_id):
 
     return result[0] or 0
 
+
 def get_subject_wise_performance(student_id):
 
     conn = create_connection()
@@ -1089,6 +1123,7 @@ def get_subject_wise_performance(student_id):
     conn.close()
 
     return records
+
 
 def get_student_by_email(email):
 
@@ -1119,16 +1154,3 @@ def get_student_by_email(email):
     conn.close()
 
     return student
-
-
-
-
-
-
-    
-
-       
-
-
-
-        
