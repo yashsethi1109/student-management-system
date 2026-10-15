@@ -1,3 +1,5 @@
+import os
+
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
@@ -13,7 +15,13 @@ from reportlab.lib.units import inch
 
 from datetime import datetime
 
+
 def generate_report(student, marks, attendance, output_path):
+
+    # The generated_reports folder is not stored in Git,
+    # so create the output folder if it is missing
+    output_folder = os.path.dirname(output_path) or "."
+    os.makedirs(output_folder, exist_ok=True)
 
     styles = getSampleStyleSheet()
 
@@ -62,17 +70,17 @@ def generate_report(student, marks, attendance, output_path):
     info_table = Table(student_info)
 
     info_table.setStyle(TableStyle([
-        ("GRID",(0,0),(-1,-1),1,colors.grey),
-        ("BACKGROUND",(0,0),(0,-1),colors.lightgrey),
-        ("BOTTOMPADDING",(0,0),(-1,-1),8),
+        ("GRID", (0, 0), (-1, -1), 1, colors.grey),
+        ("BACKGROUND", (0, 0), (0, -1), colors.lightgrey),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
     ]))
 
     elements.append(info_table)
 
     elements.append(
-        Spacer(1,0.30*inch)
+        Spacer(1, 0.30 * inch)
     )
-    
+
     elements.append(
         Paragraph(
             "Subject Wise Marks",
@@ -106,24 +114,24 @@ def generate_report(student, marks, attendance, output_path):
 
     marks_table.setStyle(TableStyle([
 
-        ("GRID",(0,0),(-1,-1),1,colors.black),
+        ("GRID", (0, 0), (-1, -1), 1, colors.black),
 
-        ("BACKGROUND",(0,0),(-1,0),colors.darkblue),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.darkblue),
 
-        ("TEXTCOLOR",(0,0),(-1,0),colors.white),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
 
-        ("ALIGN",(0,0),(-1,-1),"CENTER"),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
 
-        ("BACKGROUND",(0,1),(-1,-1),colors.beige),
+        ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
 
-        ("BOTTOMPADDING",(0,0),(-1,0),10)
+        ("BOTTOMPADDING", (0, 0), (-1, 0), 10)
 
     ]))
 
     elements.append(marks_table)
 
     elements.append(
-        Spacer(1,0.30*inch)
+        Spacer(1, 0.30 * inch)
     )
 
     total_classes = attendance[0] or 0
@@ -152,7 +160,7 @@ def generate_report(student, marks, attendance, output_path):
     )
 
     elements.append(
-        Spacer(1,0.30*inch)
+        Spacer(1, 0.30 * inch)
     )
 
     elements.append(
